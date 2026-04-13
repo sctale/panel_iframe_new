@@ -43,7 +43,8 @@ class SimpleConfigFlow(ConfigFlow, domain=manifest.domain):
 
 class OptionsFlowHandler(OptionsFlow):
     def __init__(self, config_entry: ConfigEntry):
-        self.config_entry = config_entry
+        super().__init__()
+        self._entry = config_entry
 
     async def async_step_init(self, user_input=None):
         return await self.async_step_user(user_input)
@@ -51,7 +52,7 @@ class OptionsFlowHandler(OptionsFlow):
     async def async_step_user(self, user_input=None):
         errors = {}
         if user_input is None:
-            options = self.config_entry.options
+            options = self._entry.options
             errors = {}
             DATA_SCHEMA = vol.Schema({
                 vol.Required("icon", default=options.get('icon', 'mdi:link-box-outline')): str,
