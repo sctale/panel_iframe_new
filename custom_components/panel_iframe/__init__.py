@@ -7,6 +7,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.components.http import StaticPathConfig
 from homeassistant.components import frontend
 from homeassistant.components.panel_custom import async_register_panel
+from homeassistant.helpers.issue_registry import async_create_issue, IssueSeverity
 import homeassistant.helpers.config_validation as cv
 
 from .const import DOMAIN, CONF_URL, CONF_MODE, CONF_ICON, CONF_REQUIRE_ADMIN, CONF_PROXY_ACCESS
@@ -22,6 +23,16 @@ PROXY_DATA_KEY = f"{DOMAIN}_proxies"
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     """集成设置入口（YAML 配置已弃用）"""
+    if DOMAIN in config:
+        async_create_issue(
+            hass,
+            DOMAIN,
+            "yaml_deprecated",
+            is_fixable=False,
+            severity=IssueSeverity.WARNING,
+            translation_key="yaml_deprecated",
+        )
+        _LOGGER.warning("YAML 配置已弃用，请通过 UI 配置流添加面板")
     return True
 
 
@@ -76,7 +87,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """配置项版本迁移"""
     _LOGGER.debug("迁移配置项从版本 %s", entry.version)
-    # 当前版本为 1，无需迁移
+
+    if entry.version == 1:
+        # 版本 1 → 2：无需数据变更，仅版本号升级
+        # 未来如有配置结构变更，在此添加迁移逻辑
+        new_version = 2
+        hass.config_entries.async_update_entry(entry, version=new_version)
+        _LOGGER.info("配置项已迁移到版本 %s", new_version)
+
     return True
 
 

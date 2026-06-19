@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.3.3 (2026-06-19)
+
+### 新增
+- 添加 `diagnostics.py` 诊断支持，允许用户下载集成诊断信息（URL 自动脱敏）
+- 添加 `repair_issues` 支持：YAML 配置弃用时在 HA 修复页面显示警告
+- `manifest.json` 添加 `loggers` 字段（HA 标准要求）
+- `async_migrate_entry` 实现版本迁移逻辑（版本 1 → 2）
+- 翻译文件添加 `issues` 翻译（YAML 弃用警告）
+
+### 变更
+- `ConfigFlow.VERSION` 从 1 升级到 2
+- `async_setup` 检测 YAML 配置时创建修复建议 issue
+
 ## 0.3.2 (2026-06-19)
 
 ### 新增

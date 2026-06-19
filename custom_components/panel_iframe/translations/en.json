@@ -58,5 +58,11 @@
                 "3": "Built-in - Navigate within HA"
             }
         }
+    },
+    "issues": {
+        "yaml_deprecated": {
+            "title": "YAML configuration is deprecated",
+            "description": "YAML configuration for Sidebar Panel is deprecated. Please configure panels via Settings → Devices & Services → Add Integration. YAML configuration will be ignored."
+        }
     }
 }

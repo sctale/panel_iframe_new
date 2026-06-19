@@ -42,7 +42,7 @@ MODE_OPTIONS: list[SelectOptionDict] = [
 class PanelIframeConfigFlow(ConfigFlow, domain=DOMAIN):
     """处理配置流程"""
 
-    VERSION = 1
+    VERSION = 2
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
