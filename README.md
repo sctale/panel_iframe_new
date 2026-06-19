@@ -2,7 +2,7 @@
 
 [![hacs_badge](https://img.shields.io/badge/Home-Assistant-%23049cdb)](https://www.home-assistant.io/)
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
-[![version](https://img.shields.io/badge/version-0.3.4-blue)](https://github.com/sctale/panel_iframe)
+[![version](https://img.shields.io/badge/version-0.3.4-blue)](https://github.com/sctale/panel_iframe_new)
 
 在 Home Assistant 侧边栏添加自定义 iframe 面板，支持将任意网页嵌入到 HA 界面中。
 
@@ -40,7 +40,7 @@
 由于本插件不在 HACS 默认仓库中，需要先添加自定义仓库：
 
 1. 打开 HACS → 右上角 ⋯ → 自定义仓库
-2. 仓库地址填入：`https://github.com/sctale/panel_iframe`
+2. 仓库地址填入：`https://github.com/sctale/panel_iframe_new`
 3. 类别选择：集成
 4. 点击添加
 5. 在 HACS 中搜索「侧边栏面板」或「panel_iframe」
