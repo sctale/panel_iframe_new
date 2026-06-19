@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.2.2 (2026-06-19)
+
+### 新增
+- 前端面板组件添加 iframe 加载状态指示（spinner + 文字提示）
+- 前端面板组件拆分为独立渲染方法（`_renderDefault`/`_renderFullscreen`/`_renderHttpsWarning`），代码更清晰
+- URL 处理逻辑提取为 `_normalizeUrl` 方法，更健壮
+- HTTPS 安全提示页面优化：添加警告图标、圆角按钮、更好的视觉层次
+- 全屏模式移动端导航按钮改用原生 `<button>` + 圆角阴影样式
+
+### 变更
+- `index.html` 重写：使用 IIFE 避免全局污染、添加 URL 解析错误处理、优化加载动画样式
+- `panel_iframe.js` 使用 HA CSS 变量（`--divider-color`、`--secondary-text-color`、`--card-background-color` 等）替代硬编码颜色
+- `panel_iframe.js` iframe 加载完成后才显示，之前是直接显示空白 iframe
+
 ## 0.2.1 (2026-06-19)
 
 ### 新增

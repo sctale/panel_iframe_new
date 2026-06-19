@@ -5,131 +5,114 @@
   <meta charset="utf-8" />
   <meta name="viewport"
     content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-  <title>侧边栏管理</title>
+  <title>侧边栏面板</title>
   <style>
-    html,
-    body {
+    html, body {
       margin: 0;
       padding: 0;
-      text-align: center;
+      height: 100%;
       overflow: hidden;
-      height: 90%;
     }
 
     body {
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-direction: column;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
-    a {
-      text-decoration: none;
-      color: #03a9f4;
-      display: block;
-      margin: 30px 0;
-      transition: .1s;
-    }
-
-    a:hover {
-      color: #3788d8;
-    }
-
-    #link:hover {
-      font-size: 20px;
-    }
-
-    #orgin {
-      font-size: 50px;
-    }
-
-    .loader,
-    .loader:after {
-      border-radius: 50%;
-      width: 10em;
-      height: 10em;
-    }
-
+    /* 加载动画 */
     .loader {
-      margin: 60px auto;
+      margin: 0 auto 24px;
       font-size: 10px;
       position: relative;
       text-indent: -9999em;
-      border-top: 1.1em solid rgba(3, 169, 244, 0.2);
-      border-right: 1.1em solid rgba(3, 169, 244, 0.2);
-      border-bottom: 1.1em solid rgba(3, 169, 244, 0.2);
-      border-left: 1.1em solid #03a9f4;
-      -webkit-transform: translateZ(0);
-      -ms-transform: translateZ(0);
-      transform: translateZ(0);
-      -webkit-animation: load8 1.1s infinite linear;
-      animation: load8 1.1s infinite linear;
+      border-radius: 50%;
+      width: 6em;
+      height: 6em;
+      border-top: 0.8em solid rgba(3, 169, 244, 0.2);
+      border-right: 0.8em solid rgba(3, 169, 244, 0.2);
+      border-bottom: 0.8em solid rgba(3, 169, 244, 0.2);
+      border-left: 0.8em solid #03a9f4;
+      animation: spin 1s infinite linear;
     }
 
-    @-webkit-keyframes load8 {
-      0% {
-        -webkit-transform: rotate(0deg);
-        transform: rotate(0deg);
-      }
-
-      100% {
-        -webkit-transform: rotate(360deg);
-        transform: rotate(360deg);
-      }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
 
-    @keyframes load8 {
-      0% {
-        -webkit-transform: rotate(0deg);
-        transform: rotate(0deg);
-      }
+    .info {
+      text-align: center;
+      color: #666;
+    }
 
-      100% {
-        -webkit-transform: rotate(360deg);
-        transform: rotate(360deg);
-      }
+    .info a {
+      color: #03a9f4;
+      text-decoration: none;
+    }
+
+    .info a:hover {
+      text-decoration: underline;
+    }
+
+    .host {
+      font-size: 24px;
+      font-weight: 500;
+      color: #333;
+      margin-top: 16px;
     }
   </style>
 </head>
 
 <body>
-  <div>
-    <div class="loader">Loading...</div>
-    <a id="link" target="_blank">https://github.com/shaonianzhentan</a>
-    <a id="orgin" target="_blank">github.com</a>
+  <div class="info">
+    <div class="loader">加载中...</div>
+    <a id="link" target="_blank"></a>
+    <div id="host" class="host"></div>
   </div>
   <script>
-    const setLink = (id, text, link) => {
-      const a = document.getElementById(id)
-      a.innerText = text
-      a.setAttribute('href', link)
-    }
+    (function () {
+      if (!location.search) return;
 
-    var ha = {
-      init() {
-        if (!location.search) return;
-        let query = new URLSearchParams(location.search)
-        let url = decodeURIComponent(query.get('url'))
-        // 显示链接在界面
-        setLink('link', url, url)
+      const query = new URLSearchParams(location.search);
+      const url = decodeURIComponent(query.get('url') || '');
+      const mode = query.get('mode');
 
-        if (url.startsWith('http')) {
-          const uri = new URL(url)
-          setLink('orgin', uri.host, uri.origin)
-        }
+      if (!url) return;
 
-        let mode = query.get('mode')
-        // 如果HTTPS协议，则打开新页面
-        if (location.protocol === 'https:' && url.indexOf('http://') == 0) {
-          return window.open(url)
+      // 显示链接信息
+      const linkEl = document.getElementById('link');
+      const hostEl = document.getElementById('host');
+      linkEl.textContent = url;
+      linkEl.href = url;
+
+      if (url.startsWith('http')) {
+        try {
+          const uri = new URL(url);
+          hostEl.textContent = uri.host;
+          hostEl.onclick = () => window.open(uri.origin);
+          hostEl.style.cursor = 'pointer';
+        } catch (e) {
+          // URL 解析失败，忽略
         }
-        // 打开新页面
-        if (mode == 2) {
-          return window.open(url)
-        }
-        location.href = url
       }
-    }
-    ha.init()
+
+      // HTTPS 环境下 HTTP 链接，打开新标签页
+      if (location.protocol === 'https:' && url.indexOf('http://') === 0) {
+        window.open(url);
+        return;
+      }
+
+      // 新页面模式，打开新标签页
+      if (mode === '2') {
+        window.open(url);
+        return;
+      }
+
+      // 默认跳转
+      location.href = url;
+    })();
   </script>
 </body>
 
