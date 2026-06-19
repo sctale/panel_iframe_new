@@ -18,12 +18,13 @@ MAX_REQUEST_BODY = 10 * 1024 * 1024
 # 代理请求时过滤的请求头
 FILTERED_REQUEST_HEADERS = frozenset({
     'host', 'transfer-encoding', 'cookie', 'authorization',
-    'connection', 'content-length',
+    'connection', 'content-length', 'upgrade', 'proxy-connection',
+    'expect', 'keep-alive', 'proxy-authorization',
 })
 
 # 代理响应时过滤的响应头
 FILTERED_RESPONSE_HEADERS = frozenset({
-    'transfer-encoding', 'set-cookie',
+    'transfer-encoding', 'set-cookie', 'connection', 'keep-alive',
 })
 
 # 跳过响应体的状态码（304 Not Modified 等）
@@ -81,9 +82,14 @@ class HttpProxy:
     def register(self, router):
         """注册路由（如果路由已存在则跳过）"""
         route_url = f'/{self.proxy_path}/'
-        # 检查路由是否已注册
+        # 检查路由是否已注册（兼容不同 aiohttp 版本的 resource 表示）
         for resource in router.resources():
-            resource_path = getattr(resource, 'canonical', '')
+            resource_path = ''
+            if hasattr(resource, 'canonical'):
+                resource_path = resource.canonical
+            elif hasattr(resource, 'get_info'):
+                info = resource.get_info()
+                resource_path = info.get('path', '') if isinstance(info, dict) else str(info)
             if self.proxy_path in resource_path:
                 _LOGGER.debug("代理路由已存在，跳过注册: %s", route_url)
                 return
@@ -189,5 +195,7 @@ class HttpProxy:
                 )
         except aiohttp.ClientError as err:
             _LOGGER.warning("WebSocket 代理连接失败 %s: %s", target, err)
-        finally:
-            return ws_server
+        except Exception as err:
+            _LOGGER.warning("WebSocket 代理异常 %s: %s", target, err)
+
+        return ws_server

@@ -82,7 +82,7 @@ class PanelIframeOptionsFlow(OptionsFlow):
 
     def __init__(self, entry: ConfigEntry) -> None:
         """初始化选项流程"""
-        super().__init__()
+        super().__init__(entry)
         self._entry = entry
 
     async def async_step_init(

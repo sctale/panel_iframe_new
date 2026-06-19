@@ -14,6 +14,7 @@ class HaPanelIframe extends HTMLElement {
     this._hass = null;
     this._narrow = false;
     this._loadTimer = null;
+    this._renderedKey = null;
   }
 
   set panel(panel) {
@@ -30,10 +31,9 @@ class HaPanelIframe extends HTMLElement {
 
   set narrow(narrow) {
     this._narrow = narrow;
+    // 仅更新已渲染元素的 narrow 状态，避免 iframe 重新加载
+    this._updateNarrow();
     this._updateMenuButton();
-    if (this.isConnected) {
-      this._render();
-    }
   }
 
   connectedCallback() {
@@ -43,6 +43,11 @@ class HaPanelIframe extends HTMLElement {
   }
 
   disconnectedCallback() {
+    this._clearLoadTimer();
+  }
+
+  /** 清理加载超时定时器 */
+  _clearLoadTimer() {
     if (this._loadTimer) {
       clearTimeout(this._loadTimer);
       this._loadTimer = null;
@@ -63,8 +68,19 @@ class HaPanelIframe extends HTMLElement {
     }
   }
 
+  /** 更新 narrow 相关样式，不触发重新渲染 */
+  _updateNarrow() {
+    if (!this.shadowRoot) return;
+    const host = this;
+    if (this._narrow) {
+      host.setAttribute('narrow', '');
+    } else {
+      host.removeAttribute('narrow');
+    }
+  }
+
   _fireEvent(type, data) {
-    this.dispatchEvent(new Event(type, {
+    this.dispatchEvent(new CustomEvent(type, {
       bubbles: true,
       cancelable: false,
       composed: true,
@@ -109,6 +125,16 @@ class HaPanelIframe extends HTMLElement {
     const { config, title } = this._panel;
     const url = this._normalizeUrl(config.url);
     const mode = config.mode;
+
+    // 使用缓存 key 避免相同配置下重复渲染导致 iframe 重新加载
+    const renderKey = mode + '|' + url + '|' + title;
+    if (this._renderedKey === renderKey) {
+      this._updateNarrow();
+      this._updateMenuButton();
+      return;
+    }
+    this._renderedKey = renderKey;
+    this._clearLoadTimer();
 
     // 新页面模式 - 直接打开新标签页
     if (mode === '2') {
@@ -173,6 +199,7 @@ class HaPanelIframe extends HTMLElement {
       </div>
     `;
     this._updateMenuButton();
+    this._updateNarrow();
   }
 
   /** 渲染全屏模式 */
@@ -228,10 +255,7 @@ class HaPanelIframe extends HTMLElement {
     }, this.constructor.IFRAME_TIMEOUT);
 
     iframe.addEventListener('load', () => {
-      if (this._loadTimer) {
-        clearTimeout(this._loadTimer);
-        this._loadTimer = null;
-      }
+      this._clearLoadTimer();
       wrapper.classList.add('loaded');
     });
 
@@ -257,6 +281,8 @@ class HaPanelIframe extends HTMLElement {
       menuBtn.addEventListener('click', this._toggleMenu.bind(this));
       btnsContainer.appendChild(menuBtn);
     }
+
+    this._updateNarrow();
   }
 
   /** 渲染默认模式（带工具栏） */
@@ -329,10 +355,7 @@ class HaPanelIframe extends HTMLElement {
     }, this.constructor.IFRAME_TIMEOUT);
 
     iframe.addEventListener('load', () => {
-      if (this._loadTimer) {
-        clearTimeout(this._loadTimer);
-        this._loadTimer = null;
-      }
+      this._clearLoadTimer();
       wrapper.classList.add('loaded');
     });
 
@@ -343,6 +366,7 @@ class HaPanelIframe extends HTMLElement {
     });
 
     this._updateMenuButton();
+    this._updateNarrow();
   }
 }
 

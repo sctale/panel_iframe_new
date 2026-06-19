@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.3.5 (2026-06-19)
+
+### 修复
+- 修复 `config_flow.py` 中 `OptionsFlow.__init__()` 未传递 `entry` 参数的问题，兼容 HA 2026.6+ 的选项流程 API
+- 修复 `panel_iframe.js` 中 `location-changed` 等事件使用 `Event` 构造函数导致 `detail` 丢失的问题，改用 `CustomEvent`
+- 修复 `panel_iframe.js` 中 `narrow` 属性变化时重新渲染整个 iframe 的问题，改为仅更新 narrow 相关样式
+- 修复 `panel_iframe.js` 中相同配置下重复渲染导致 iframe 重新加载的问题，增加渲染缓存 key
+- 修复 `http_proxy.py` 中代理路由重复注册判断依赖 `canonical` 属性的兼容性问题
+- 修复 `http_proxy.py` 中 WebSocket 代理在 `finally` 块中 `return` 的语法警告问题
+
+### 安全
+- 增强 `http_proxy.py` 代理请求头过滤，新增 `upgrade`、`proxy-connection`、`expect`、`proxy-authorization` 等敏感头
+- 增强 `http_proxy.py` 代理响应头过滤，新增 `connection`、`keep-alive` 头
+
 ## 0.3.4 (2026-06-19)
 
 ### 新增
