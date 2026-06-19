@@ -333,7 +333,7 @@ class HaPanelIframe extends HTMLElement {
         <div class="iframe-wrapper">
           <iframe title="${safeTitle}" sandbox="${this._getSandbox()}"
             referrerpolicy="no-referrer" loading="lazy"
-            allow="fullscreen" src="/panel_iframe_www/index.html?mode=${mode}&url=${encodeURIComponent(url)}"></iframe>
+            allow="fullscreen" src="/panel_iframe_new_www/index.html?mode=${mode}&url=${encodeURIComponent(url)}"></iframe>
         </div>
         <div class="loading" role="status"><div class="spinner" aria-hidden="true"></div>加载中...</div>
       </div>
@@ -370,4 +370,4 @@ class HaPanelIframe extends HTMLElement {
   }
 }
 
-customElements.define('ha-panel_iframe', HaPanelIframe);
+customElements.define('ha-panel_iframe_new', HaPanelIframe);

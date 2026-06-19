@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.0.0 (2026-06-19)
+
+### 破坏性变更
+- Home Assistant 集成域名从 `panel_iframe` 变更为 `panel_iframe_new`
+- 静态资源路径从 `/panel_iframe_www` 变更为 `/panel_iframe_new_www`
+- 前端组件名称从 `ha-panel_iframe` 变更为 `ha-panel_iframe_new`
+- 旧版本用户升级后需要删除旧面板并重新添加配置
+
+### 变更
+- 版本号从 0.3.6 升级至 1.0.0（主版本号 +1）
+- 更新 `manifest.json`、`package.json`、`hacs.json` 中的域名和版本号
+- 更新 README.md 中所有相关引用和安装说明
+
 ## 0.3.6 (2026-06-19)
 
 ### 修复

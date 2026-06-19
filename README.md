@@ -1,10 +1,12 @@
-# 侧边栏面板 (panel_iframe)
+# 侧边栏面板 (panel_iframe_new)
 
 [![home-assistant](https://img.shields.io/badge/Home-Assistant-%23049cdb)](https://www.home-assistant.io/)
 [![hacs](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
-[![version](https://img.shields.io/badge/version-0.3.6-blue)](https://github.com/sctale/panel_iframe_new)
+[![version](https://img.shields.io/badge/version-1.0.0-blue)](https://github.com/sctale/panel_iframe_new)
 
 在 Home Assistant 侧边栏添加自定义 iframe 面板，支持将任意网页嵌入到 HA 界面中。
+
+> **注意**：从 **1.0.0** 开始，本插件的 Home Assistant 集成域名已从 `panel_iframe` 变更为 `panel_iframe_new`。旧版本用户升级后需要重新添加面板配置。
 
 ## 致谢
 
@@ -35,12 +37,12 @@
 
 ## 兼容性
 
-| HA 版本 | 插件版本 | 状态 |
-|---------|---------|------|
-| 2025.1+ | 0.3.6 | 兼容 |
-| 2026.6.3 | 0.3.6 | 推荐 |
+| HA 版本 | 最低插件版本 | 状态 |
+|---------|-------------|------|
+| 2025.1+ | 1.0.0 | 兼容 |
+| 2026.6.3 | 1.0.0 | 推荐 |
 
-> **注意**：HA 2026.6+ 请使用 **0.3.6 及以上版本**，否则选项配置页面可能无法打开。
+> **注意**：HA 2026.6+ 请使用 **1.0.0 及以上版本**。
 
 ## 安装方式
 
@@ -52,30 +54,31 @@
 2. 仓库地址填入：`https://github.com/sctale/panel_iframe_new`
 3. 类别选择：**集成**
 4. 点击**添加**
-5. 在 HACS 中搜索「侧边栏面板」或「panel_iframe」
+5. 在 HACS 中搜索「侧边栏面板」或 `panel_iframe_new`
 6. 点击**安装**
 7. 重启 Home Assistant
 8. 清空浏览器缓存并刷新页面
 
 ### 手动安装
 
-1. 下载本仓库的 `custom_components/panel_iframe` 目录
-2. 复制到你的 Home Assistant `custom_components/` 目录下
+1. 从 [Releases](https://github.com/sctale/panel_iframe_new/releases/latest) 下载最新源码或 zip 包
+2. 将 `custom_components/panel_iframe_new` 目录复制到你的 Home Assistant `custom_components/` 目录下
 3. 重启 Home Assistant
 4. 清空浏览器缓存并刷新页面
 
 ## 升级注意事项
 
-- 升级后请务必**清空浏览器缓存**或强制刷新页面（Ctrl+F5 / Cmd+Shift+R），否则前端可能继续使用旧版 `panel_iframe.js`
-- 每个面板是一个独立的集成配置项，升级后原有配置会自动保留
+- 从 0.x 升级到 1.0.0 属于**破坏性更新**：集成域名已变更，升级后需要删除旧面板并重新添加
+- 升级后请务必**清空浏览器缓存**或强制刷新页面（Ctrl+F5 / Cmd+Shift+R），否则前端可能继续使用旧版 `panel_iframe_new.js`
+- 每个面板是一个独立的集成配置项
 
 ## 使用方法
 
 ### 添加面板
 
-安装完成后，在 **设置 → 设备与服务 → 添加集成** 中搜索 `panel_iframe` 或「侧边栏面板」：
+安装完成后，在 **设置 → 设备与服务 → 添加集成** 中搜索 `panel_iframe_new` 或「侧边栏面板」：
 
-[![Add Integration](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start?domain=panel_iframe)
+[![Add Integration](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start?domain=panel_iframe_new)
 
 1. 搜索并选择「侧边栏面板」
 2. 输入面板名称（如：Node-RED）
@@ -157,11 +160,15 @@
 
 ### 诊断信息
 
-在 **设置 → 设备与服务** 中点击面板集成 → 右上角 ⋯ → **下载诊断**，可获取配置信息用于问题排查（URL 中的敏感信息会自动脱敏）。
+1. 进入 **设置 → 设备与服务**
+2. 点击对应的面板集成卡片
+3. 点击右上角 ⋯ → **下载诊断**
+4. 下载的文件中包含配置信息（URL 中的敏感信息会自动脱敏），可用于问题排查
 
 ### 修复建议
 
-如果仍使用 YAML 配置方式，HA 修复页面会显示弃用警告，请迁移到 UI 配置流。
+- 本插件不支持 YAML 配置，如需迁移请删除 `configuration.yaml` 中的旧配置节点，并通过 UI 配置流重新添加面板
+- 升级后若页面行为异常，请先清空浏览器缓存并刷新页面
 
 ## 许可证
 

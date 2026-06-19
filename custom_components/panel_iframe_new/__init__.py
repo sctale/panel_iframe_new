@@ -42,7 +42,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     if not hass.data.get(STATIC_PATH_KEY):
         www_path = hass.config.path("custom_components", DOMAIN, "www")
         await hass.http.async_register_static_paths(
-            [StaticPathConfig("/panel_iframe_www", www_path, False)]
+            [StaticPathConfig("/panel_iframe_new_www", www_path, False)]
         )
         hass.data[STATIC_PATH_KEY] = True
         _LOGGER.debug("静态资源路径已注册: %s", www_path)
@@ -58,7 +58,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     proxy_access = cfg.get(CONF_PROXY_ACCESS, False)
 
     if url is not None:
-        module_url = f"/panel_iframe_www/panel_iframe.js?v={entry.version}"
+        module_url = f"/panel_iframe_new_www/panel_iframe_new.js?v={entry.version}"
 
         if proxy_access:
             proxy = HttpProxy(url)
@@ -71,7 +71,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         await async_register_panel(
             hass,
             frontend_url_path=url_path,
-            webcomponent_name="ha-panel_iframe",
+            webcomponent_name="ha-panel_iframe_new",
             sidebar_title=title,
             sidebar_icon=icon,
             module_url=module_url,

@@ -1,7 +1,7 @@
 {
-    "domain": "panel_iframe",
+    "domain": "panel_iframe_new",
     "name": "侧边栏面板",
-    "version": "0.3.6",
+    "version": "1.0.0",
     "config_flow": true,
     "integration_type": "service",
     "documentation": "https://github.com/sctale/panel_iframe_new",
@@ -10,5 +10,5 @@
     "codeowners": ["@shaonianzhentan", "@Sid"],
     "quality_scale": "bronze",
     "iot_class": "local_push",
-    "loggers": ["panel_iframe", "custom_components.panel_iframe"]
+    "loggers": ["panel_iframe_new", "custom_components.panel_iframe_new"]
 }

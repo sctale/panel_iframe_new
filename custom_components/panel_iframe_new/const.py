@@ -1,6 +1,6 @@
 """侧边栏面板常量定义"""
 
-DOMAIN = "panel_iframe"
+DOMAIN = "panel_iframe_new"
 
 # 平台列表（本集成无实体平台）
 PLATFORMS: list[str] = []
