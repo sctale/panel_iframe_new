@@ -1,26 +1,26 @@
-# 侧边栏面板 (Panel Iframe)
+# 侧边栏面板 (panel_iframe)
 
-[![hacs_badge](https://img.shields.io/badge/Home-Assistant-%23049cdb)](https://www.home-assistant.io/)
-[![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
-[![version](https://img.shields.io/badge/version-0.3.5-blue)](https://github.com/sctale/panel_iframe_new)
+[![home-assistant](https://img.shields.io/badge/Home-Assistant-%23049cdb)](https://www.home-assistant.io/)
+[![hacs](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
+[![version](https://img.shields.io/badge/version-0.3.6-blue)](https://github.com/sctale/panel_iframe_new)
 
 在 Home Assistant 侧边栏添加自定义 iframe 面板，支持将任意网页嵌入到 HA 界面中。
 
 ## 致谢
 
-本项目基于 **[@shaonianzhentan](https://github.com/shaonianzhentan)** 的原创工作 [panel_iframe](https://github.com/shaonianzhentan/panel_iframe) 开发，感谢原作者的贡献和付出！
+本项目基于 **[@shaonianzhentan](https://github.com/shaonianzhentan)** 的原创项目 [panel_iframe](https://github.com/shaonianzhentan/panel_iframe) 开发，感谢原作者的贡献和付出！
 
 ## 与原版的区别
 
-原版 `panel_iframe` 是 Home Assistant 内置的 YAML 配置集成，已在 HA 2024 年被移除。本改版的主要区别：
+原版 `panel_iframe` 是 Home Assistant 核心内置的 YAML 配置方式（通过 `panel_iframe:` 配置），已在 HA 2024 年被移除。本改版改为自定义组件集成，主要区别如下：
 
 | 特性 | 原版 (HA 内置) | 本改版 |
-|------|--------------|--------|
-| 配置方式 | YAML (`configuration.yaml`) | UI 配置流（设置 → 集成） |
-| 多面板支持 | YAML 配置多个 | 每个面板单独添加集成 |
-| 动态增删 | 需重启 HA | 无需重启，即改即生效 |
+|------|---------------|--------|
+| 配置方式 | YAML (`configuration.yaml`) | UI 配置流（设置 → 设备与服务 → 集成） |
+| 多面板支持 | 一个 YAML 节点配置多个面板 | 每个面板单独添加一个集成实例 |
+| 动态增删 | 修改 YAML 后需重启 HA | 无需重启，即改即生效 |
 | 代理访问 | 不支持 | 支持 HTTP/HTTPS 反向代理 |
-| HTTPS 兼容 | 无提示 | 自动检测并提示新标签页打开 |
+| HTTPS 兼容 | 无提示 | 自动检测并提示在新标签页打开 |
 | MDI 图标预览 | 不支持 | 内置图标预览页面 |
 
 ## 功能特性
@@ -31,78 +31,95 @@
 - 支持管理员可见设置
 - 支持 WebSocket 代理
 - HTTPS 环境下自动检测并提示安全限制
-- 兼容 Home Assistant 2025.x - 2026.x
+- 兼容 Home Assistant 2025.1+，已针对 2026.6.3 验证
+
+## 兼容性
+
+| HA 版本 | 插件版本 | 状态 |
+|---------|---------|------|
+| 2025.1+ | 0.3.6 | 兼容 |
+| 2026.6.3 | 0.3.6 | 推荐 |
+
+> **注意**：HA 2026.6+ 请使用 **0.3.6 及以上版本**，否则选项配置页面可能无法打开。
 
 ## 安装方式
 
 ### 通过 HACS 安装（推荐）
 
-由于本插件不在 HACS 默认仓库中，需要先添加自定义仓库：
+本插件不在 HACS 默认仓库中，需要先添加自定义仓库：
 
 1. 打开 HACS → 右上角 ⋯ → 自定义仓库
 2. 仓库地址填入：`https://github.com/sctale/panel_iframe_new`
-3. 类别选择：集成
-4. 点击添加
+3. 类别选择：**集成**
+4. 点击**添加**
 5. 在 HACS 中搜索「侧边栏面板」或「panel_iframe」
-6. 点击安装
+6. 点击**安装**
 7. 重启 Home Assistant
-8. 刷新页面
+8. 清空浏览器缓存并刷新页面
 
 ### 手动安装
 
 1. 下载本仓库的 `custom_components/panel_iframe` 目录
 2. 复制到你的 Home Assistant `custom_components/` 目录下
 3. 重启 Home Assistant
-4. 刷新页面
+4. 清空浏览器缓存并刷新页面
+
+## 升级注意事项
+
+- 升级后请务必**清空浏览器缓存**或强制刷新页面（Ctrl+F5 / Cmd+Shift+R），否则前端可能继续使用旧版 `panel_iframe.js`
+- 每个面板是一个独立的集成配置项，升级后原有配置会自动保留
 
 ## 使用方法
 
 ### 添加面板
 
-安装完成后，在 **设置 → 设备与服务 → 添加集成** 中搜索 `侧边栏面板` 即可。
+安装完成后，在 **设置 → 设备与服务 → 添加集成** 中搜索 `panel_iframe` 或「侧边栏面板」：
 
 [![Add Integration](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start?domain=panel_iframe)
 
 1. 搜索并选择「侧边栏面板」
 2. 输入面板名称（如：Node-RED）
-3. 在选项中配置各项参数
+3. 点击提交后，在选项中配置各项参数
+
+> **面板名称唯一性**：每个面板的名称会作为唯一标识，不支持重复名称。
 
 ### 配置项说明
 
 | 参数 | 说明 | 示例 |
 |------|------|------|
-| 图标 | 侧边栏显示的图标 | `mdi:nodejs` |
+| 图标 | 侧边栏显示的 MDI 图标 | `mdi:nodejs` |
 | 链接 | 要嵌入的网页地址 | `http://192.168.1.100:1880` |
 | 显示模式 | 面板的展示方式 | 见下方说明 |
-| 管理员可见 | 仅管理员可看到此面板 | 开/关 |
-| 代理访问 | 通过 HA 服务器代理请求 | 开/关 |
+| 管理员可见 | 开启后仅管理员可在侧边栏看到此面板 | 开/关 |
+| 代理访问 | 通过 HA 服务器代理请求，解决跨域问题 | 开/关 |
 
 ### 显示模式
 
 | 模式 | 说明 |
 |------|------|
-| 默认 | 带 HA 顶部工具栏的 iframe 嵌入，可返回侧边栏 |
+| 默认 | 带 HA 顶部工具栏的 iframe 嵌入 |
 | 全屏 | 无工具栏的全屏 iframe，适合监控大屏等场景 |
 | 新页面 | 在新浏览器标签页中打开链接 |
-| 内置页面 | 在 HA 内部导航到指定路径（如 `/config/dashboard`） |
+| 内置页面 | 在 HA 内部导航到指定路径（如 `/config/dashboard`），无需 iframe |
 
 ### 链接格式支持
 
-链接字段支持多种简写格式，会自动补全：
+链接字段支持多种简写格式，会自动补全为完整 URL：
 
 | 输入 | 解析结果 |
 |------|---------|
 | `http://192.168.1.100:1880` | 原样使用 |
-| `1880` | 自动补为 `http://当前主机:1880` |
-| `//192.168.1.100:1880` | 自动补为 `当前协议://当前主机:1880` |
-| `:1880/node-red/` | 自动补为 `当前协议://当前主机:1880/node-red/` |
+| `1880` | `http://当前主机:1880` |
+| `//192.168.1.100:1880` | `当前协议://192.168.1.100:1880`（复用当前协议，保留输入的主机） |
+| `:1880/node-red/` | `当前协议://当前主机:1880/node-red/` |
 
 ### 代理访问
 
-启用代理访问后，可以通过 HA 服务器代理访问内网服务，解决浏览器跨域限制：
+启用代理访问后，请求会通过 HA 服务器转发到目标内网服务，解决浏览器跨域限制：
 
-- 内网地址：`http://192.168.1.100:1880/node-red/`
-- 代理地址：`http://HA地址:8123/node-red/`
+- 代理路径根据目标 URL 自动生成
+- 例如目标为 `http://192.168.1.100:1880/node-red/`，代理地址可能为 `http://HA地址:8123/node-red/`
+- 代理路径以目标 URL 中的路径部分为准，具体可在 HA 日志中查看注册信息
 
 **注意事项：**
 - 代理访问适用于内网 HTTP/HTTPS 服务
@@ -121,13 +138,13 @@
 ### 更新面板
 
 1. 进入 **设置 → 设备与服务**
-2. 找到对应的面板集成，点击「配置」
+2. 找到对应的面板集成，点击**配置**
 3. 修改参数后点击提交，面板立即生效，无需重启
 
 ### 删除面板
 
 1. 进入 **设置 → 设备与服务**
-2. 找到对应的面板集成，点击右上角 ⋯ → 删除
+2. 找到对应的面板集成，点击右上角 ⋯ → **删除**
 3. 面板立即从侧边栏移除
 
 ## 已知限制
@@ -140,17 +157,11 @@
 
 ### 诊断信息
 
-在集成页面点击面板集成 → 右上角 ⋯ → 下载诊断，可获取配置信息用于问题排查（URL 中的敏感信息会自动脱敏）。
+在 **设置 → 设备与服务** 中点击面板集成 → 右上角 ⋯ → **下载诊断**，可获取配置信息用于问题排查（URL 中的敏感信息会自动脱敏）。
 
 ### 修复建议
 
 如果仍使用 YAML 配置方式，HA 修复页面会显示弃用警告，请迁移到 UI 配置流。
-
-## 兼容性
-
-| HA 版本 | 插件版本 | 状态 |
-|---------|---------|------|
-| 2025.1+ | 0.3.5 | 兼容 |
 
 ## 许可证
 

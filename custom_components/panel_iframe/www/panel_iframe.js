@@ -108,9 +108,9 @@ class HaPanelIframe extends HTMLElement {
     if (/^\d+$/.test(url)) {
       return 'http://' + location.hostname + ':' + url;
     }
-    // 双斜杠开头
+    // 双斜杠开头：复用当前协议，保留后续主机和路径
     if (url.indexOf('//') === 0) {
-      return location.protocol + '//' + location.hostname + url.substring(1);
+      return location.protocol + url.substring(2);
     }
     // 冒号开头（端口路径）
     if (url.indexOf(':') === 0) {
