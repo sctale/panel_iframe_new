@@ -42,7 +42,7 @@ MODE_OPTIONS: list[SelectOptionDict] = [
 class PanelIframeConfigFlow(ConfigFlow, domain=DOMAIN):
     """处理配置流程"""
 
-    VERSION = 2
+    VERSION = 1
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
@@ -72,7 +72,7 @@ class PanelIframeConfigFlow(ConfigFlow, domain=DOMAIN):
 
     @staticmethod
     @callback
-    def async_get_options_flow(entry: ConfigEntry):
+    def async_get_options_flow(entry: ConfigEntry) -> OptionsFlow:
         """获取选项流程"""
         return PanelIframeOptionsFlow(entry)
 
@@ -107,8 +107,8 @@ class PanelIframeOptionsFlow(OptionsFlow):
         # 双斜杠开头（如 //192.168.1.1:1880）
         if url.startswith("//"):
             return None
-        # 冒号开头（如 :1880/node-red/）
-        if url.startswith(":") and len(url) > 1:
+        # 冒号开头（仅支持 :端口 或 :端口/路径 的简写）
+        if url.startswith(":") and len(url) > 1 and url[1:].split('/')[0].isdigit():
             return None
         return "invalid_url"
 

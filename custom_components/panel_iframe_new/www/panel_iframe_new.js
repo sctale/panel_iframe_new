@@ -112,8 +112,8 @@ class HaPanelIframe extends HTMLElement {
     if (url.indexOf('//') === 0) {
       return location.protocol + url.substring(2);
     }
-    // 冒号开头（端口路径）
-    if (url.indexOf(':') === 0) {
+    // 冒号开头（仅支持 :端口 或 :端口/路径 的简写）
+    if (url.indexOf(':') === 0 && /^:\d+/.test(url)) {
       return location.protocol + '//' + location.hostname + url;
     }
     return url;
@@ -138,7 +138,7 @@ class HaPanelIframe extends HTMLElement {
 
     // 新页面模式 - 直接打开新标签页
     if (mode === '2') {
-      window.open(url, '_blank', 'noreferrer,noopener');
+      window.open(url, '_blank', 'noreferrer');
       return;
     }
 
@@ -333,7 +333,7 @@ class HaPanelIframe extends HTMLElement {
         <div class="iframe-wrapper">
           <iframe title="${safeTitle}" sandbox="${this._getSandbox()}"
             referrerpolicy="no-referrer" loading="lazy"
-            allow="fullscreen" src="/panel_iframe_new_www/index.html?mode=${mode}&url=${encodeURIComponent(url)}"></iframe>
+            allow="fullscreen" src="${safeUrl}"></iframe>
         </div>
         <div class="loading" role="status"><div class="spinner" aria-hidden="true"></div>加载中...</div>
       </div>

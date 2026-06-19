@@ -1,5 +1,30 @@
 # Changelog
 
+## 1.0.1 (2026-06-19)
+
+### 修复
+- 修复 `config_flow.py` 中 `VERSION = 2` 未重置为新 domain 初始版本的问题，改为 `VERSION = 1`
+- 修复 `URL_ALLOWED_SCHEMES` 包含 `ws://`/`wss://` 但代理和 iframe 均不支持的问题
+- 修复 `http_proxy.py` 中路由匹配使用子串判断导致误匹配的问题，改为精确匹配
+- 修复代理路由在面板删除/卸载时未注销的问题，新增 `unregister` 方法并在卸载时调用
+- 修复 `__init__.py` 卸载时未清理 `STATIC_PATH_KEY` 的问题
+- 修复默认模式仍通过 `index.html` 中转导致多一次请求的问题，改为 iframe 直接嵌入
+- 修复 `window.open` features 参数包含不标准 `noopener` 的问题
+- 修复冒号开头 URL 简写验证过宽的安全问题，限制为仅 `:端口` 或 `:端口/路径`
+
+### 优化
+- `__init__.py` 中 `async_setup` 参数类型改为 `ConfigType`
+- `__init__.py` 中静态资源路径改为使用 `os.path.dirname(__file__)` 相对定位
+- 提取 `STATIC_URL_PATH` 常量，避免硬编码
+- `async_get_options_flow` 和 `http_proxy.py` 多个方法补充类型注解
+- 增强代理请求头过滤，新增 `x-forwarded-*`、`x-real-ip` 等转发头过滤
+- `diagnostics.py` 中 `urlparse` 导入移至顶部，并抽取 `_mask_credentials` 函数
+- 移除未使用的 `PLATFORMS` 常量和空的 `services.yaml`
+- 移除不再使用的 `www/index.html` 中转页
+
+### 文档
+- 更新 README.md 兼容性说明和链接格式支持表
+
 ## 1.0.0 (2026-06-19)
 
 ### 破坏性变更

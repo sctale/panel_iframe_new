@@ -2,7 +2,7 @@
 
 [![home-assistant](https://img.shields.io/badge/Home-Assistant-%23049cdb)](https://www.home-assistant.io/)
 [![hacs](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
-[![version](https://img.shields.io/badge/version-1.0.0-blue)](https://github.com/sctale/panel_iframe_new)
+[![version](https://img.shields.io/badge/version-1.0.1-blue)](https://github.com/sctale/panel_iframe_new)
 
 在 Home Assistant 侧边栏添加自定义 iframe 面板，支持将任意网页嵌入到 HA 界面中。
 
@@ -39,10 +39,10 @@
 
 | HA 版本 | 最低插件版本 | 状态 |
 |---------|-------------|------|
-| 2025.1+ | 1.0.0 | 兼容 |
-| 2026.6.3 | 1.0.0 | 推荐 |
+| 2025.1+ | 1.0.1 | 兼容 |
+| 2026.6.3 | 1.0.1 | 推荐 |
 
-> **注意**：HA 2026.6+ 请使用 **1.0.0 及以上版本**。
+> **注意**：HA 2026.6+ 请使用 **1.0.0 及以上版本**。\n> \n> **1.0.0 破坏性变更**：集成域名从 `panel_iframe` 改为 `panel_iframe_new`，升级后需要删除旧面板并重新添加。
 
 ## 安装方式
 
@@ -115,6 +115,7 @@
 | `1880` | `http://当前主机:1880` |
 | `//192.168.1.100:1880` | `当前协议://192.168.1.100:1880`（复用当前协议，保留输入的主机） |
 | `:1880/node-red/` | `当前协议://当前主机:1880/node-red/` |
+| `ws://` / `wss://` | 不支持作为面板链接，WebSocket 请通过代理访问自动处理 |
 
 ### 代理访问
 

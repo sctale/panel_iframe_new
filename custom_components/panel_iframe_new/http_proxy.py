@@ -2,10 +2,10 @@
 
 import asyncio
 import logging
+from urllib.parse import urlparse
 
 import aiohttp
 from aiohttp import web
-from urllib.parse import urlparse
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -20,6 +20,8 @@ FILTERED_REQUEST_HEADERS = frozenset({
     'host', 'transfer-encoding', 'cookie', 'authorization',
     'connection', 'content-length', 'upgrade', 'proxy-connection',
     'expect', 'keep-alive', 'proxy-authorization',
+    'x-forwarded-for', 'x-forwarded-host', 'x-forwarded-proto',
+    'x-forwarded-port', 'x-real-ip',
 })
 
 # 代理响应时过滤的响应头
@@ -51,6 +53,7 @@ class HttpProxy:
         self.proxy_scheme = parsed_url.scheme or 'http'
         self.proxy_host = parsed_url.netloc
         self.proxy_path = route_path
+        self._route: web.Resource | None = None
 
     @classmethod
     def _get_session(cls) -> aiohttp.ClientSession:
@@ -69,7 +72,7 @@ class HttpProxy:
         return cls._session
 
     @classmethod
-    async def cleanup(cls):
+    async def cleanup(cls) -> None:
         """清理 ClientSession 和 Connector（集成卸载时调用）"""
         if cls._session and not cls._session.closed:
             await cls._session.close()
@@ -79,10 +82,10 @@ class HttpProxy:
             cls._connector = None
         _LOGGER.debug("代理 ClientSession 和 Connector 已关闭")
 
-    def register(self, router):
+    def register(self, router: web.UrlDispatcher) -> None:
         """注册路由（如果路由已存在则跳过）"""
         route_url = f'/{self.proxy_path}/'
-        # 检查路由是否已注册（兼容不同 aiohttp 版本的 resource 表示）
+        # 检查路由是否已注册（精确匹配）
         for resource in router.resources():
             resource_path = ''
             if hasattr(resource, 'canonical'):
@@ -90,17 +93,25 @@ class HttpProxy:
             elif hasattr(resource, 'get_info'):
                 info = resource.get_info()
                 resource_path = info.get('path', '') if isinstance(info, dict) else str(info)
-            if self.proxy_path in resource_path:
+            # aiohttp 动态路由的 canonical 形如 /path/{tail:.*}
+            if resource_path.rstrip('/').startswith(route_url.rstrip('/')):
                 _LOGGER.debug("代理路由已存在，跳过注册: %s", route_url)
                 return
-        router.add_route('*', route_url + '{tail:.*}', self.handler)
+        self._route = router.add_route('*', route_url + '{tail:.*}', self.handler)
         _LOGGER.debug("代理路由已注册: %s", route_url)
 
-    def get_url(self, hostname=''):
+    def unregister(self, router: web.UrlDispatcher) -> None:
+        """注销路由"""
+        if self._route is not None:
+            router.remove_resource(self._route)
+            self._route = None
+            _LOGGER.debug("代理路由已注销: %s", self.proxy_path)
+
+    def get_url(self, hostname: str = '') -> str:
         """获取访问地址"""
         return f'{hostname}/{self.proxy_path}/'
 
-    def get_path(self, request):
+    def get_path(self, request: web.Request) -> str:
         """获取真实路径地址"""
         url_path = request.rel_url.path
         if self.is_root:
@@ -112,7 +123,7 @@ class HttpProxy:
         """根据代理协议返回 WebSocket 协议"""
         return 'wss' if self.proxy_scheme == 'https' else 'ws'
 
-    async def handler(self, request):
+    async def handler(self, request: web.Request) -> web.StreamResponse:
         """请求处理器"""
         target_ws = f'{self._ws_scheme}://{self.proxy_host}'
         target_http = f'{self.proxy_scheme}://{self.proxy_host}'
@@ -120,7 +131,7 @@ class HttpProxy:
             return await self.websocket_handler(request, target_ws)
         return await self.http_handler(request, target_http)
 
-    async def http_handler(self, request, target_url):
+    async def http_handler(self, request: web.Request, target_url: str) -> web.Response:
         """HTTP 请求代理"""
         target = target_url + self.get_path(request)
         if request.query_string:
@@ -144,7 +155,7 @@ class HttpProxy:
                 headers={k: v for k, v in request.headers.items()
                          if k.lower() not in FILTERED_REQUEST_HEADERS},
                 data=body,
-                ssl=False,
+                ssl=False,  # 允许自签名证书的内网服务
             ) as resp:
                 headers = {k: v for k, v in resp.headers.items()
                            if k.lower() not in FILTERED_RESPONSE_HEADERS}
@@ -168,7 +179,7 @@ class HttpProxy:
                 content_type="text/plain",
             )
 
-    async def websocket_handler(self, request, target_url):
+    async def websocket_handler(self, request: web.Request, target_url: str) -> web.WebSocketResponse:
         """WebSocket 代理"""
         ws_server = web.WebSocketResponse()
         await ws_server.prepare(request)
@@ -177,7 +188,8 @@ class HttpProxy:
         session = self._get_session()
         try:
             async with session.ws_connect(target) as ws_client:
-                async def ws_forward(ws_from, ws_to):
+                async def ws_forward(ws_from: aiohttp.ClientWebSocketResponse | web.WebSocketResponse,
+                                     ws_to: aiohttp.ClientWebSocketResponse | web.WebSocketResponse) -> None:
                     async for msg in ws_from:
                         if msg.type == aiohttp.WSMsgType.TEXT:
                             await ws_to.send_str(msg.data)

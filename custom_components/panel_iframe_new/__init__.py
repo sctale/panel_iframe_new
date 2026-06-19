@@ -1,6 +1,7 @@
 """侧边栏面板 - 在 Home Assistant 侧边栏添加自定义 iframe 面板"""
 
 import logging
+import os
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -9,6 +10,7 @@ from homeassistant.components import frontend
 from homeassistant.components.panel_custom import async_register_panel
 from homeassistant.helpers.issue_registry import async_create_issue, IssueSeverity
 import homeassistant.helpers.config_validation as cv
+from homeassistant.helpers.typing import ConfigType
 
 from .const import DOMAIN, CONF_URL, CONF_MODE, CONF_ICON, CONF_REQUIRE_ADMIN, CONF_PROXY_ACCESS
 from .http_proxy import HttpProxy
@@ -19,9 +21,10 @@ CONFIG_SCHEMA = cv.deprecated(DOMAIN)
 
 STATIC_PATH_KEY = f"{DOMAIN}_static_path_registered"
 PROXY_DATA_KEY = f"{DOMAIN}_proxies"
+STATIC_URL_PATH = "/panel_iframe_new_www"
 
 
-async def async_setup(hass: HomeAssistant, config: dict) -> bool:
+async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     """集成设置入口（YAML 配置已弃用）"""
     if DOMAIN in config:
         async_create_issue(
@@ -40,9 +43,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """设置配置项"""
     # 注册静态资源路径（仅需注册一次）
     if not hass.data.get(STATIC_PATH_KEY):
-        www_path = hass.config.path("custom_components", DOMAIN, "www")
+        www_path = os.path.join(os.path.dirname(__file__), "www")
         await hass.http.async_register_static_paths(
-            [StaticPathConfig("/panel_iframe_new_www", www_path, False)]
+            [StaticPathConfig(STATIC_URL_PATH, www_path, False)]
         )
         hass.data[STATIC_PATH_KEY] = True
         _LOGGER.debug("静态资源路径已注册: %s", www_path)
@@ -58,7 +61,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     proxy_access = cfg.get(CONF_PROXY_ACCESS, False)
 
     if url is not None:
-        module_url = f"/panel_iframe_new_www/panel_iframe_new.js?v={entry.version}"
+        module_url = f"{STATIC_URL_PATH}/panel_iframe_new.js?v={entry.version}"
 
         if proxy_access:
             proxy = HttpProxy(url)
@@ -85,16 +88,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 
 async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """配置项版本迁移"""
+    """配置项版本迁移（当前无迁移需求）"""
     _LOGGER.debug("迁移配置项从版本 %s", entry.version)
-
-    if entry.version == 1:
-        # 版本 1 → 2：无需数据变更，仅版本号升级
-        # 未来如有配置结构变更，在此添加迁移逻辑
-        new_version = 2
-        hass.config_entries.async_update_entry(entry, version=new_version)
-        _LOGGER.info("配置项已迁移到版本 %s", new_version)
-
     return True
 
 
@@ -116,17 +111,28 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """卸载配置项"""
     url_path = entry.entry_id
     frontend.async_remove_panel(hass, url_path)
+
+    # 清理该面板的代理实例和路由
+    proxies = hass.data.get(PROXY_DATA_KEY, {})
+    proxy = proxies.pop(entry.entry_id, None)
+    if proxy is not None:
+        proxy.unregister(hass.http.app.router)
+        _LOGGER.info("代理已注销: %s", proxy.proxy_path)
+
     _LOGGER.info("面板已移除: %s", entry.title)
     return True
 
 
 async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """移除配置项时清理"""
-    # 清理该面板的代理实例
     proxies = hass.data.get(PROXY_DATA_KEY, {})
-    if entry.entry_id in proxies:
-        del proxies[entry.entry_id]
+    # 确保代理已清理（async_unload_entry 通常已处理）
+    proxy = proxies.pop(entry.entry_id, None)
+    if proxy is not None:
+        proxy.unregister(hass.http.app.router)
+
     # 所有代理都已移除时，关闭共享 ClientSession
     if not proxies:
         await HttpProxy.cleanup()
+        hass.data.pop(STATIC_PATH_KEY, None)
     _LOGGER.info("配置项已清理: %s", entry.title)

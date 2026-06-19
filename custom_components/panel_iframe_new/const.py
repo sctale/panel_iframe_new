@@ -2,9 +2,6 @@
 
 DOMAIN = "panel_iframe_new"
 
-# 平台列表（本集成无实体平台）
-PLATFORMS: list[str] = []
-
 # 配置项键名
 CONF_ICON = "icon"
 CONF_URL = "url"
@@ -31,5 +28,5 @@ MODE_LIST = {
     MODE_BUILTIN: "内置页面",
 }
 
-# URL 验证：允许的协议前缀
-URL_ALLOWED_SCHEMES = ("http://", "https://", "ws://", "wss://")
+# URL 验证：允许的协议前缀（仅支持 HTTP/HTTPS，WebSocket 通过代理模式处理）
+URL_ALLOWED_SCHEMES = ("http://", "https://")
