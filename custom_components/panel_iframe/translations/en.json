@@ -12,8 +12,12 @@
                 }
             }
         },
-        "error": {},
-        "abort": {}
+        "error": {
+            "empty_title": "Panel name cannot be empty"
+        },
+        "abort": {
+            "already_configured": "A panel with this name already exists"
+        }
     },
     "options": {
         "step": {
@@ -36,7 +40,9 @@
                 }
             }
         },
-        "error": {}
+        "error": {
+            "empty_url": "URL cannot be empty"
+        }
     },
     "selector": {
         "mode": {

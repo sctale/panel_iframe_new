@@ -7,7 +7,6 @@ import voluptuous as vol
 
 from homeassistant.config_entries import ConfigFlow, ConfigFlowResult, OptionsFlow
 from homeassistant.core import callback
-from homeassistant.data_entry_flow import section
 from homeassistant.helpers.selector import (
     IconSelector,
     SelectSelector,
@@ -47,17 +46,27 @@ class PanelIframeConfigFlow(ConfigFlow, domain=DOMAIN):
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         """处理用户步骤"""
-        if user_input is None:
-            return self.async_show_form(
-                step_id="user",
-                data_schema=vol.Schema({
-                    vol.Required("title"): TextSelector(
-                        TextSelectorConfig()
-                    ),
-                }),
-            )
+        errors: dict[str, str] = {}
 
-        return self.async_create_entry(title=user_input["title"], data=user_input)
+        if user_input is not None:
+            title = user_input.get("title", "").strip()
+            if not title:
+                errors["title"] = "empty_title"
+            else:
+                # 检查是否已存在同名面板
+                await self.async_set_unique_id(title)
+                self._abort_if_unique_id_configured()
+                return self.async_create_entry(title=title, data=user_input)
+
+        return self.async_show_form(
+            step_id="user",
+            errors=errors,
+            data_schema=vol.Schema({
+                vol.Required("title"): TextSelector(
+                    TextSelectorConfig()
+                ),
+            }),
+        )
 
     @staticmethod
     @callback
@@ -83,33 +92,42 @@ class PanelIframeOptionsFlow(OptionsFlow):
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         """处理选项更新"""
-        if user_input is None:
-            options = self._entry.options
-            return self.async_show_form(
-                step_id="user",
-                data_schema=vol.Schema({
-                    vol.Required(CONF_ICON, default=options.get(CONF_ICON, DEFAULT_ICON)): IconSelector(),
-                    vol.Required(CONF_URL, default=options.get(CONF_URL, "")): TextSelector(
-                        TextSelectorConfig()
-                    ),
-                    vol.Required(CONF_MODE, default=options.get(CONF_MODE, DEFAULT_MODE)): SelectSelector(
-                        SelectSelectorConfig(options=MODE_OPTIONS, translation_key="mode")
-                    ),
-                    vol.Required(CONF_REQUIRE_ADMIN, default=options.get(CONF_REQUIRE_ADMIN, DEFAULT_REQUIRE_ADMIN)): BooleanSelector(
-                        BooleanSelectorConfig()
-                    ),
-                    vol.Required(CONF_PROXY_ACCESS, default=options.get(CONF_PROXY_ACCESS, DEFAULT_PROXY_ACCESS)): BooleanSelector(
-                        BooleanSelectorConfig()
-                    ),
-                }),
-            )
+        errors: dict[str, str] = {}
 
-        # 选项更新
-        user_input[CONF_ICON] = user_input[CONF_ICON].strip().replace("mdi-", "mdi:")
-        user_input[CONF_URL] = user_input[CONF_URL].strip()
+        if user_input is not None:
+            url = user_input[CONF_URL].strip()
 
-        # 内置页面禁止使用代理
-        if user_input[CONF_MODE] == "3":
-            user_input[CONF_PROXY_ACCESS] = False
+            # URL 不能为空
+            if not url:
+                errors[CONF_URL] = "empty_url"
+            else:
+                # 规范化图标格式
+                user_input[CONF_ICON] = user_input[CONF_ICON].strip().replace("mdi-", "mdi:")
+                user_input[CONF_URL] = url
 
-        return self.async_create_entry(title="", data=user_input)
+                # 内置页面禁止使用代理
+                if user_input[CONF_MODE] == "3":
+                    user_input[CONF_PROXY_ACCESS] = False
+
+                return self.async_create_entry(title="", data=user_input)
+
+        options = self._entry.options
+        return self.async_show_form(
+            step_id="user",
+            errors=errors,
+            data_schema=vol.Schema({
+                vol.Required(CONF_ICON, default=options.get(CONF_ICON, DEFAULT_ICON)): IconSelector(),
+                vol.Required(CONF_URL, default=options.get(CONF_URL, "")): TextSelector(
+                    TextSelectorConfig()
+                ),
+                vol.Required(CONF_MODE, default=options.get(CONF_MODE, DEFAULT_MODE)): SelectSelector(
+                    SelectSelectorConfig(options=MODE_OPTIONS, translation_key="mode")
+                ),
+                vol.Required(CONF_REQUIRE_ADMIN, default=options.get(CONF_REQUIRE_ADMIN, DEFAULT_REQUIRE_ADMIN)): BooleanSelector(
+                    BooleanSelectorConfig()
+                ),
+                vol.Required(CONF_PROXY_ACCESS, default=options.get(CONF_PROXY_ACCESS, DEFAULT_PROXY_ACCESS)): BooleanSelector(
+                    BooleanSelectorConfig()
+                ),
+            }),
+        )

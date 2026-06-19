@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.4 (2026-06-19)
+
+### 新增
+- 配置流程添加面板名称唯一性检查，防止重复添加同名面板
+- 配置流程添加输入验证：面板名称不能为空、链接地址不能为空
+- strings.json 和翻译文件添加错误消息翻译（`empty_title`、`empty_url`、`already_configured`）
+
+### 变更
+- 移除 `config_flow.py` 中未使用的 `section` 导入
+- 配置流程使用 `async_set_unique_id` + `_abort_if_unique_id_configured` 替代手动检查
+
 ## 0.2.3 (2026-06-19)
 
 ### 变更

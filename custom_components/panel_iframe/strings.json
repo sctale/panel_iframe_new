@@ -12,8 +12,12 @@
                 }
             }
         },
-        "error": {},
-        "abort": {}
+        "error": {
+            "empty_title": "面板名称不能为空"
+        },
+        "abort": {
+            "already_configured": "该面板名称已存在"
+        }
     },
     "options": {
         "step": {
@@ -36,7 +40,9 @@
                 }
             }
         },
-        "error": {}
+        "error": {
+            "empty_url": "链接地址不能为空"
+        }
     },
     "selector": {
         "mode": {
