@@ -6,7 +6,6 @@ from homeassistant.components.http import StaticPathConfig
 from homeassistant.components import frontend
 from homeassistant.components.panel_custom import async_register_panel
 import homeassistant.helpers.config_validation as cv
-import asyncio
 
 from .manifest import manifest
 from .http_proxy import HttpProxy
@@ -16,14 +15,19 @@ VERSION = manifest.version
 
 CONFIG_SCHEMA = cv.deprecated(DOMAIN)
 
+_STATIC_PATH_REGISTERED = False
+
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """设置配置项"""
-    # 注册静态资源路径
-    www_path = hass.config.path("custom_components", DOMAIN, "www")
-    await hass.http.async_register_static_paths(
-        [StaticPathConfig("/panel_iframe_www", www_path, False)]
-    )
+    # 注册静态资源路径（仅需注册一次）
+    global _STATIC_PATH_REGISTERED
+    if not _STATIC_PATH_REGISTERED:
+        www_path = hass.config.path("custom_components", DOMAIN, "www")
+        await hass.http.async_register_static_paths(
+            [StaticPathConfig("/panel_iframe_www", www_path, False)]
+        )
+        _STATIC_PATH_REGISTERED = True
 
     # 添加面板
     cfg = entry.options
@@ -61,7 +65,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 async def update_listener(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """处理选项更新"""
     await async_unload_entry(hass, entry)
-    await asyncio.sleep(1)
     await async_setup_entry(hass, entry)
 
 

@@ -1,19 +1,13 @@
 {
+  "name": "panel_iframe",
+  "version": "0.2.0",
+  "description": "Home Assistant 侧边栏面板 - 在侧边栏添加自定义 iframe 面板",
+  "private": true,
+  "scripts": {
+    "update:mdi": "npm install @mdi/font && npx shx cp -r node_modules/@mdi/font/preview.html custom_components/panel_iframe/www/mdi/ && npx shx cp -r node_modules/@mdi/font/css/* custom_components/panel_iframe/www/mdi/css/ && npx shx cp -r node_modules/@mdi/font/fonts/* custom_components/panel_iframe/www/mdi/fonts/"
+  },
   "dependencies": {
     "@mdi/font": "^7.4.47"
   },
-  "name": "panel_iframe",
-  "description": "[![hacs_badge](https://img.shields.io/badge/Home-Assistant-%23049cdb)](https://www.home-assistant.io/)\r [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)",
-  "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npm install @mdi/font & build.cmd"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git@gitee.com:shaonianzhentan/panel_iframe.git"
-  },
-  "author": "",
-  "license": "ISC"
+  "license": "MIT"
 }

@@ -18,6 +18,8 @@ class HttpProxy:
             self.is_root = True
         else:
             self.is_root = False
+
+        self.proxy_scheme = parsed_url.scheme or 'http'
         self.proxy_host = parsed_url.netloc
         self.proxy_path = route_path
 
@@ -40,7 +42,7 @@ class HttpProxy:
     async def handler(self, request):
         """请求处理器"""
         target_ws = f'ws://{self.proxy_host}'
-        target_http = f'http://{self.proxy_host}'
+        target_http = f'{self.proxy_scheme}://{self.proxy_host}'
         if request.headers.get('Upgrade', '').lower() == 'websocket':
             return await self.websocket_handler(request, target_ws)
         return await self.http_handler(request, target_http)
@@ -55,10 +57,13 @@ class HttpProxy:
             async with session.request(
                 method=request.method,
                 url=target,
-                headers={k: v for k, v in request.headers.items() if k.lower() != 'host'},
-                data=await request.read()
+                headers={k: v for k, v in request.headers.items()
+                         if k.lower() not in ('host', 'transfer-encoding')},
+                data=await request.read(),
+                ssl=False,
             ) as resp:
-                headers = {k: v for k, v in resp.headers.items() if k.lower() != 'transfer-encoding'}
+                headers = {k: v for k, v in resp.headers.items()
+                           if k.lower() != 'transfer-encoding'}
                 body = await resp.read()
                 return web.Response(body=body, status=resp.status, headers=headers)
 

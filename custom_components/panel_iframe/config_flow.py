@@ -6,8 +6,6 @@ from typing import Any
 import voluptuous as vol
 
 from homeassistant.data_entry_flow import FlowResult
-
-import homeassistant.helpers.config_validation as cv
 from homeassistant.core import callback
 from homeassistant.config_entries import ConfigFlow, OptionsFlow, ConfigEntry
 

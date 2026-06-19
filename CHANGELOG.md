@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.2.0 (2026-06-19)
+
+### 新增
+- 代理访问支持 HTTPS 目标站点（自动识别 URL 协议）
+- 代理请求忽略 SSL 证书验证（适配自签名证书的内网服务）
+- README 新增「与原版的区别」对比表
+- README 新增「链接格式支持」说明
+- README 新增「添加多个面板」说明
+- README 新增「已知限制」章节
+
+### 变更
+- JS 面板组件修复 Shadow DOM 内 `ha-menu-button` 属性绑定问题（改用 JS 手动设置属性）
+- 静态资源路径注册改为仅注册一次，避免多面板时报错
+- 移除 `update_listener` 中的 `asyncio.sleep(1)`，选项更新更即时
+- 移除 `config_flow.py` 中未使用的 `cv` 导入
+- `package.json` 清理：移除 gitee 仓库引用、修正描述、更新版本号
+- 删除过时的 Windows 批处理脚本 `build.cmd`，MDI 更新改为 npm script
+
+### 修复
+- 修复多面板场景下静态路径重复注册可能报错的问题
+- 修复 Shadow DOM 内 HA 自定义元素属性无法正确传递的问题
+- 修复 `http_proxy.py` 代理请求转发时未过滤 `transfer-encoding` 请求头的问题
+
 ## 0.1.0 (2026-06-19)
 
 ### 新增
