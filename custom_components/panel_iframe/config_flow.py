@@ -1,3 +1,5 @@
+"""侧边栏面板配置流程"""
+
 from __future__ import annotations
 
 from typing import Any
@@ -19,41 +21,44 @@ mode_list = {
 }
 
 class SimpleConfigFlow(ConfigFlow, domain=manifest.domain):
+    """处理配置流程"""
 
     VERSION = 1
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
-
+        """处理用户步骤"""
         if user_input is None:
-            errors = {}
             DATA_SCHEMA = vol.Schema({
                 vol.Required("title"): str,
             })
-            return self.async_show_form(step_id="user", data_schema=DATA_SCHEMA, errors=errors)
+            return self.async_show_form(step_id="user", data_schema=DATA_SCHEMA)
 
         return self.async_create_entry(title=user_input['title'], data=user_input)
 
     @staticmethod
     @callback
     def async_get_options_flow(entry: ConfigEntry):
+        """获取选项流程"""
         return OptionsFlowHandler(entry)
 
 
 class OptionsFlowHandler(OptionsFlow):
+    """处理选项流程"""
+
     def __init__(self, config_entry: ConfigEntry):
         super().__init__()
         self._entry = config_entry
 
     async def async_step_init(self, user_input=None):
+        """选项流程初始步骤"""
         return await self.async_step_user(user_input)
 
     async def async_step_user(self, user_input=None):
-        errors = {}
+        """处理选项更新"""
         if user_input is None:
             options = self._entry.options
-            errors = {}
             DATA_SCHEMA = vol.Schema({
                 vol.Required("icon", default=options.get('icon', 'mdi:link-box-outline')): str,
                 vol.Required("url", default=options.get('url', '')): str,
@@ -61,7 +66,8 @@ class OptionsFlowHandler(OptionsFlow):
                 vol.Required("require_admin", default=options.get('require_admin', False)): bool,
                 vol.Required("proxy_access", default=options.get('proxy_access', False)): bool,
             })
-            return self.async_show_form(step_id="user", data_schema=DATA_SCHEMA, errors=errors)
+            return self.async_show_form(step_id="user", data_schema=DATA_SCHEMA)
+
         # 选项更新
         user_input['icon'] = user_input['icon'].strip().replace('mdi-', 'mdi:')
         user_input['url'] = user_input['url'].strip()

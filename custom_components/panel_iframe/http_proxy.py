@@ -1,13 +1,18 @@
-import aiohttp, asyncio
+"""HTTP 代理模块 - 处理跨域请求和 WebSocket 代理"""
+
+import asyncio
+import aiohttp
 from aiohttp import web
 from urllib.parse import urlparse
 
+
 class HttpProxy:
+    """HTTP 反向代理，用于在 HA 内访问外部页面"""
 
     def __init__(self, url: str):
         parsed_url = urlparse(url)
         route_path = parsed_url.path.strip('/')
-        
+
         if route_path == '':
             route_path = parsed_url.netloc.replace(':', '').replace('.', '')
             self.is_root = True
@@ -17,32 +22,31 @@ class HttpProxy:
         self.proxy_path = route_path
 
     def register(self, router):
-        ''' 路由注册 '''
+        """注册路由"""
         route_url = f'/{self.proxy_path}/' + '{tail:.*}'
-        # print(route_url)
         router.add_route('*', route_url, self.handler)
 
     def get_url(self, hostname=''):
-        ''' 获取访问地址 '''
+        """获取访问地址"""
         return f'{hostname}/{self.proxy_path}/'
 
     def get_path(self, request):
-        ''' 获取真实路径地址 '''
+        """获取真实路径地址"""
         url_path = request.rel_url.path
         if self.is_root:
             url_path = url_path.replace(f'/{self.proxy_path}', '')
         return url_path
 
     async def handler(self, request):
+        """请求处理器"""
         target_ws = f'ws://{self.proxy_host}'
         target_http = f'http://{self.proxy_host}'
         if request.headers.get('Upgrade', '').lower() == 'websocket':
             return await self.websocket_handler(request, target_ws)
-        else:
-            return await self.http_handler(request, target_http)
+        return await self.http_handler(request, target_http)
 
     async def http_handler(self, request, target_url):
-
+        """HTTP 请求代理"""
         target = target_url + self.get_path(request)
         if request.query_string:
             target += '?' + request.query_string
@@ -59,6 +63,7 @@ class HttpProxy:
                 return web.Response(body=body, status=resp.status, headers=headers)
 
     async def websocket_handler(self, request, target_url):
+        """WebSocket 代理"""
         ws_server = web.WebSocketResponse()
         await ws_server.prepare(request)
 
@@ -74,6 +79,9 @@ class HttpProxy:
                         elif msg.type == aiohttp.WSMsgType.CLOSE:
                             await ws_to.close()
 
-                await asyncio.gather(ws_forward(ws_server, ws_client), ws_forward(ws_client, ws_server))
+                await asyncio.gather(
+                    ws_forward(ws_server, ws_client),
+                    ws_forward(ws_client, ws_server)
+                )
 
         return ws_server

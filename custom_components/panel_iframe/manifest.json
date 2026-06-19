@@ -1,10 +1,12 @@
 {
     "domain": "panel_iframe",
-    "name": "\u4FA7\u8FB9\u680F\u9762\u677F",
-    "version": "2026.4.13",
+    "name": "侧边栏面板",
+    "version": "2026.6.1",
     "config_flow": true,
-    "documentation": "/panel_iframe_www/mdi/preview.html",
-    "dependencies": ["frontend"],
+    "integration_type": "service",
+    "documentation": "https://github.com/shaonianzhentan/panel_iframe",
+    "issue_tracker": "https://github.com/shaonianzhentan/panel_iframe/issues",
+    "dependencies": ["frontend", "panel_custom"],
     "codeowners": ["@shaonianzhentan"],
-    "quality_scale": "internal"
+    "quality_scale": "bronze"
 }

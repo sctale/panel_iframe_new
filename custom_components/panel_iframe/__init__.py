@@ -1,3 +1,5 @@
+"""侧边栏面板 - 在 Home Assistant 侧边栏添加自定义 iframe 面板"""
+
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.components.http import StaticPathConfig
@@ -5,6 +7,7 @@ from homeassistant.components import frontend
 from homeassistant.components.panel_custom import async_register_panel
 import homeassistant.helpers.config_validation as cv
 import asyncio
+
 from .manifest import manifest
 from .http_proxy import HttpProxy
 
@@ -15,15 +18,13 @@ CONFIG_SCHEMA = cv.deprecated(DOMAIN)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """设置配置项"""
+    # 注册静态资源路径
+    www_path = hass.config.path("custom_components", DOMAIN, "www")
     await hass.http.async_register_static_paths(
-        [
-            StaticPathConfig(
-                "/panel_iframe_www",
-                hass.config.path("custom_components/" + DOMAIN + "/www"),
-                False,
-            )
-        ]
+        [StaticPathConfig("/panel_iframe_www", www_path, False)]
     )
+
     # 添加面板
     cfg = entry.options
     url_path = entry.entry_id
@@ -52,19 +53,20 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             config={"mode": mode, "url": url},
             require_admin=require_admin,
         )
+
     entry.async_on_unload(entry.add_update_listener(update_listener))
     return True
 
 
-async def update_listener(hass, entry):
-    """Handle options update."""
+async def update_listener(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """处理选项更新"""
     await async_unload_entry(hass, entry)
     await asyncio.sleep(1)
     await async_setup_entry(hass, entry)
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """卸载配置项"""
     url_path = entry.entry_id
     frontend.async_remove_panel(hass, url_path)
-    # 移除路由监听
     return True
