@@ -12,6 +12,17 @@ _LOGGER = logging.getLogger(__name__)
 # 代理请求超时（秒）
 PROXY_TIMEOUT = aiohttp.ClientTimeout(total=30)
 
+# 代理请求时过滤的请求头
+FILTERED_REQUEST_HEADERS = frozenset({
+    'host', 'transfer-encoding', 'cookie', 'authorization',
+    'connection', 'content-length',
+})
+
+# 代理响应时过滤的响应头
+FILTERED_RESPONSE_HEADERS = frozenset({
+    'transfer-encoding', 'set-cookie',
+})
+
 
 class HttpProxy:
     """HTTP 反向代理，用于在 HA 内访问外部页面"""
@@ -49,9 +60,16 @@ class HttpProxy:
             _LOGGER.debug("代理 ClientSession 已关闭")
 
     def register(self, router):
-        """注册路由"""
-        route_url = f'/{self.proxy_path}/' + '{tail:.*}'
-        router.add_route('*', route_url, self.handler)
+        """注册路由（如果路由已存在则跳过）"""
+        route_url = f'/{self.proxy_path}/'
+        # 检查路由是否已注册
+        for resource in router.resources():
+            resource_path = getattr(resource, 'canonical', '')
+            if self.proxy_path in resource_path:
+                _LOGGER.debug("代理路由已存在，跳过注册: %s", route_url)
+                return
+        router.add_route('*', route_url + '{tail:.*}', self.handler)
+        _LOGGER.debug("代理路由已注册: %s", route_url)
 
     def get_url(self, hostname=''):
         """获取访问地址"""
@@ -64,9 +82,14 @@ class HttpProxy:
             url_path = url_path.replace(f'/{self.proxy_path}', '')
         return url_path
 
+    @property
+    def _ws_scheme(self) -> str:
+        """根据代理协议返回 WebSocket 协议"""
+        return 'wss' if self.proxy_scheme == 'https' else 'ws'
+
     async def handler(self, request):
         """请求处理器"""
-        target_ws = f'ws://{self.proxy_host}'
+        target_ws = f'{self._ws_scheme}://{self.proxy_host}'
         target_http = f'{self.proxy_scheme}://{self.proxy_host}'
         if request.headers.get('Upgrade', '').lower() == 'websocket':
             return await self.websocket_handler(request, target_ws)
@@ -84,12 +107,12 @@ class HttpProxy:
                 method=request.method,
                 url=target,
                 headers={k: v for k, v in request.headers.items()
-                         if k.lower() not in ('host', 'transfer-encoding')},
+                         if k.lower() not in FILTERED_REQUEST_HEADERS},
                 data=await request.read(),
                 ssl=False,
             ) as resp:
                 headers = {k: v for k, v in resp.headers.items()
-                           if k.lower() != 'transfer-encoding'}
+                           if k.lower() not in FILTERED_RESPONSE_HEADERS}
                 body = await resp.read()
                 return web.Response(body=body, status=resp.status, headers=headers)
         except aiohttp.ClientError as err:

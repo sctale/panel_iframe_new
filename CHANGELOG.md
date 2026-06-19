@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.2.7 (2026-06-19)
+
+### 安全
+- 代理请求过滤更多敏感请求头（`cookie`、`authorization`、`connection`、`content-length`）
+- 代理响应过滤 `set-cookie` 头，防止代理目标设置 HA 域的 cookie
+
+### 新增
+- 代理路由注册前检查是否已存在，避免重复注册
+- WebSocket 代理协议跟随代理目标协议（HTTPS 目标使用 `wss://`）
+- `_ws_scheme` 属性自动根据 `proxy_scheme` 返回正确的 WebSocket 协议
+
+### 变更
+- 请求头和响应头过滤改用 `frozenset` 常量（`FILTERED_REQUEST_HEADERS`、`FILTERED_RESPONSE_HEADERS`）
+
 ## 0.2.6 (2026-06-19)
 
 ### 安全
