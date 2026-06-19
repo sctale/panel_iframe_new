@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.8 (2026-06-19)
+
+### 新增
+- `__init__.py` 添加 `async_setup` 入口函数（HA 标准要求）
+- `__init__.py` 添加 `async_migrate_entry` 配置项版本迁移方法
+- `manifest.json` 添加 `iot_class: "local_push"` 字段
+- `services.yaml` 空服务定义文件（HA 标准要求）
+
+### 变更
+- `manifest.json` `documentation` URL 从原作者仓库改为当前仓库 `sctale/panel_iframe`
+
 ## 0.2.7 (2026-06-19)
 
 ### 安全

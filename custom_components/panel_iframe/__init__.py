@@ -3,7 +3,7 @@
 import logging
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.components.http import StaticPathConfig
 from homeassistant.components import frontend
 from homeassistant.components.panel_custom import async_register_panel
@@ -17,6 +17,11 @@ _LOGGER = logging.getLogger(__name__)
 CONFIG_SCHEMA = cv.deprecated(DOMAIN)
 
 STATIC_PATH_KEY = f"{DOMAIN}_static_path_registered"
+
+
+async def async_setup(hass: HomeAssistant, config: dict) -> bool:
+    """集成设置入口（YAML 配置已弃用）"""
+    return True
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -62,6 +67,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         _LOGGER.info("面板已添加: %s (模式=%s)", title, mode)
 
     entry.async_on_unload(entry.add_update_listener(update_listener))
+    return True
+
+
+async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """配置项版本迁移"""
+    _LOGGER.debug("迁移配置项从版本 %s", entry.version)
+    # 当前版本为 1，无需迁移
     return True
 
 
