@@ -1,6 +1,6 @@
 # Changelog
 
-## 2026.6.1 (2026-06-19)
+## 0.1.0 (2026-06-19)
 
 ### 新增
 - 添加 `integration_type: "service"` 到 manifest.json（HA 2026 必填项）
