@@ -1,6 +1,6 @@
 """侧边栏面板常量定义"""
 
-DOMAIN = "panel_iframe_new"
+DOMAIN = "custom_sidebar_panel"
 
 # 配置项键名
 CONF_ICON = "icon"

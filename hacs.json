@@ -1,7 +1,7 @@
 {
-    "name": "侧边栏面板",
+    "name": "自定义侧边栏面板",
     "country": "CN",
     "render_readme": true,
-    "zip_release": "https://github.com/sctale/panel_iframe_new/releases/latest/download/panel_iframe_new.zip",
+    "zip_release": "https://github.com/sctale/panel_iframe_new/releases/latest/download/custom_sidebar_panel.zip",
     "homeassistant": "2025.1.0"
 }

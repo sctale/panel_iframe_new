@@ -1,12 +1,12 @@
-# 侧边栏面板 (panel_iframe_new)
+# 自定义侧边栏面板 (custom_sidebar_panel)
 
 [![home-assistant](https://img.shields.io/badge/Home-Assistant-%23049cdb)](https://www.home-assistant.io/)
 [![hacs](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
-[![version](https://img.shields.io/badge/version-1.0.1-blue)](https://github.com/sctale/panel_iframe_new)
+[![version](https://img.shields.io/badge/version-2.0.0-blue)](https://github.com/sctale/panel_iframe_new)
 
 在 Home Assistant 侧边栏添加自定义 iframe 面板，支持将任意网页嵌入到 HA 界面中。
 
-> **注意**：从 **1.0.0** 开始，本插件的 Home Assistant 集成域名已从 `panel_iframe` 变更为 `panel_iframe_new`。旧版本用户升级后需要重新添加面板配置。
+> **2.0.0 破坏性变更**：为彻底避免与原版 `panel_iframe` 冲突，集成域名已从 `panel_iframe_new` 改为 `custom_sidebar_panel`。升级后需要删除旧面板并重新添加配置。
 
 ## 致谢
 
@@ -14,10 +14,11 @@
 
 ## 与原版的区别
 
-原版 `panel_iframe` 是 Home Assistant 核心内置的 YAML 配置方式（通过 `panel_iframe:` 配置），已在 HA 2024 年被移除。本改版改为自定义组件集成，主要区别如下：
+原版 `panel_iframe` 是 Home Assistant 核心内置的 YAML 配置方式（通过 `panel_iframe:` 配置），已被移除。本改版改为自定义组件集成，域名 `custom_sidebar_panel` 与原版完全不同，不会产生冲突。
 
 | 特性 | 原版 (HA 内置) | 本改版 |
 |------|---------------|--------|
+| 集成域名 | `panel_iframe` | `custom_sidebar_panel` |
 | 配置方式 | YAML (`configuration.yaml`) | UI 配置流（设置 → 设备与服务 → 集成） |
 | 多面板支持 | 一个 YAML 节点配置多个面板 | 每个面板单独添加一个集成实例 |
 | 动态增删 | 修改 YAML 后需重启 HA | 无需重启，即改即生效 |
@@ -39,10 +40,10 @@
 
 | HA 版本 | 最低插件版本 | 状态 |
 |---------|-------------|------|
-| 2025.1+ | 1.0.1 | 兼容 |
-| 2026.6.3 | 1.0.1 | 推荐 |
+| 2025.1+ | 2.0.0 | 兼容 |
+| 2026.6.3 | 2.0.0 | 推荐 |
 
-> **注意**：HA 2026.6+ 请使用 **1.0.0 及以上版本**。\n> \n> **1.0.0 破坏性变更**：集成域名从 `panel_iframe` 改为 `panel_iframe_new`，升级后需要删除旧面板并重新添加。
+> **注意**：HA 2026.6+ 请使用 **2.0.0 及以上版本**。
 
 ## 安装方式
 
@@ -54,7 +55,7 @@
 2. 仓库地址填入：`https://github.com/sctale/panel_iframe_new`
 3. 类别选择：**集成**
 4. 点击**添加**
-5. 在 HACS 中搜索「侧边栏面板」或 `panel_iframe_new`
+5. 在 HACS 中搜索「自定义侧边栏面板」或 `custom_sidebar_panel`
 6. 点击**安装**
 7. 重启 Home Assistant
 8. 清空浏览器缓存并刷新页面
@@ -62,25 +63,25 @@
 ### 手动安装
 
 1. 从 [Releases](https://github.com/sctale/panel_iframe_new/releases/latest) 下载最新源码或 zip 包
-2. 将 `custom_components/panel_iframe_new` 目录复制到你的 Home Assistant `custom_components/` 目录下
+2. 将 `custom_components/custom_sidebar_panel` 目录复制到你的 Home Assistant `custom_components/` 目录下
 3. 重启 Home Assistant
 4. 清空浏览器缓存并刷新页面
 
 ## 升级注意事项
 
-- 从 0.x 升级到 1.0.0 属于**破坏性更新**：集成域名已变更，升级后需要删除旧面板并重新添加
-- 升级后请务必**清空浏览器缓存**或强制刷新页面（Ctrl+F5 / Cmd+Shift+R），否则前端可能继续使用旧版 `panel_iframe_new.js`
+- 从 1.x 升级到 2.0.0 属于**破坏性更新**：集成域名已变更，升级后需要删除旧面板并重新添加
+- 升级后请务必**清空浏览器缓存**或强制刷新页面（Ctrl+F5 / Cmd+Shift+R），否则前端可能继续使用旧版 JS
 - 每个面板是一个独立的集成配置项
 
 ## 使用方法
 
 ### 添加面板
 
-安装完成后，在 **设置 → 设备与服务 → 添加集成** 中搜索 `panel_iframe_new` 或「侧边栏面板」：
+安装完成后，在 **设置 → 设备与服务 → 添加集成** 中搜索 `custom_sidebar_panel` 或「自定义侧边栏面板」：
 
-[![Add Integration](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start?domain=panel_iframe_new)
+[![Add Integration](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start?domain=custom_sidebar_panel)
 
-1. 搜索并选择「侧边栏面板」
+1. 搜索并选择「自定义侧边栏面板」
 2. 输入面板名称（如：Node-RED）
 3. 点击提交后，在选项中配置各项参数
 

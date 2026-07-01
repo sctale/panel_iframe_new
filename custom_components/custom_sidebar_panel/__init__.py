@@ -21,7 +21,7 @@ CONFIG_SCHEMA = cv.deprecated(DOMAIN)
 
 STATIC_PATH_KEY = f"{DOMAIN}_static_path_registered"
 PROXY_DATA_KEY = f"{DOMAIN}_proxies"
-STATIC_URL_PATH = "/panel_iframe_new_www"
+STATIC_URL_PATH = "/custom_sidebar_panel_www"
 
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
@@ -61,7 +61,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     proxy_access = cfg.get(CONF_PROXY_ACCESS, False)
 
     if url is not None:
-        module_url = f"{STATIC_URL_PATH}/panel_iframe_new.js?v={entry.version}"
+        module_url = f"{STATIC_URL_PATH}/custom_sidebar_panel.js?v={entry.version}"
 
         if proxy_access:
             proxy = HttpProxy(url)
@@ -74,7 +74,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         await async_register_panel(
             hass,
             frontend_url_path=url_path,
-            webcomponent_name="ha-panel_iframe_new",
+            webcomponent_name="ha-custom-sidebar-panel",
             sidebar_title=title,
             sidebar_icon=icon,
             module_url=module_url,

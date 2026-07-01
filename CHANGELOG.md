@@ -1,5 +1,21 @@
 # Changelog
 
+## 2.0.0 (2026-06-19)
+
+### 破坏性变更
+- 为彻底避免与原版 `panel_iframe` 的 HACS 冲突，集成域名从 `panel_iframe_new` 改为 `custom_sidebar_panel`
+- 目录从 `custom_components/panel_iframe_new` 改为 `custom_components/custom_sidebar_panel`
+- 静态资源路径从 `/panel_iframe_new_www` 改为 `/custom_sidebar_panel_www`
+- 前端组件名从 `ha-panel_iframe_new` 改为 `ha-custom-sidebar-panel`
+- JS 文件从 `panel_iframe_new.js` 改为 `custom_sidebar_panel.js`
+- manifest `name` 从「侧边栏面板」改为「自定义侧边栏面板」
+- 1.x 用户升级后需要删除旧面板并重新添加配置
+
+### 变更
+- 版本号从 1.0.1 升级至 2.0.0（主版本号 +1）
+- 更新所有代码、配置、翻译、文档中的域名引用
+- manifest codeowners 中 `@Sid` 修正为 `@sctale`
+
 ## 1.0.1 (2026-06-19)
 
 ### 修复

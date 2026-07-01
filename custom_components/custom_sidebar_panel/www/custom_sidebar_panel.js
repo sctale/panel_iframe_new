@@ -370,4 +370,4 @@ class HaPanelIframe extends HTMLElement {
   }
 }
 
-customElements.define('ha-panel_iframe_new', HaPanelIframe);
+customElements.define('ha-custom-sidebar-panel', HaPanelIframe);

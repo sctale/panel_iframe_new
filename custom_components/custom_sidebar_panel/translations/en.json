@@ -2,7 +2,7 @@
     "config": {
         "step": {
             "user": {
-                "title": "Sidebar Panel",
+                "title": "Custom Sidebar Panel",
                 "description": "Add a custom web page panel to the Home Assistant sidebar",
                 "data": {
                     "title": "Panel Name"
@@ -62,7 +62,7 @@
     "issues": {
         "yaml_deprecated": {
             "title": "YAML configuration is deprecated",
-            "description": "YAML configuration for Sidebar Panel is deprecated. Please configure panels via Settings → Devices & Services → Add Integration. YAML configuration will be ignored."
+            "description": "YAML configuration for Custom Sidebar Panel is deprecated. Please configure panels via Settings → Devices & Services → Add Integration. YAML configuration will be ignored."
         }
     }
 }

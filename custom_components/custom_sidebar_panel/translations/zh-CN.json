@@ -2,7 +2,7 @@
     "config": {
         "step": {
             "user": {
-                "title": "侧边栏面板",
+                "title": "自定义侧边栏面板",
                 "description": "在 Home Assistant 侧边栏添加自定义网页面板",
                 "data": {
                     "title": "面板名称"
@@ -62,7 +62,7 @@
     "issues": {
         "yaml_deprecated": {
             "title": "YAML 配置已弃用",
-            "description": "侧边栏面板的 YAML 配置方式已弃用，请通过设置 → 设备与服务 → 添加集成来配置面板。YAML 中的配置将被忽略。"
+            "description": "自定义侧边栏面板的 YAML 配置方式已弃用，请通过设置 → 设备与服务 → 添加集成来配置面板。YAML 中的配置将被忽略。"
         }
     }
 }
